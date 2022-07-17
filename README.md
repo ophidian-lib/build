@@ -18,7 +18,7 @@ new Builder("src/pane-relief.ts") // <-- the path of your main module
 This is the entire build configuration.  You can do more complex things with it, but the basics are:
 
 1. You create the builder with the path of your plugin's main module (the one exporting the plugin class)
-2. You indicate whether you're using SASS, CSS, or neither.  (For SASS, you'll `import` the .scss files in your code; for CSS you'll just put a styles.css in your repository root.)
+2. You indicate whether you're using Sass, CSS, or neither.  (For Sass, you'll `import` .css or .scss files in your code; for CSS you'll just put a styles.css in your repository root.)
 3. You indicate whether you want builds to be copied to the correct directory under your `OBSIDIAN_TEST_VAULT` environment variable and hot-reloaded (if you have the hot-reload plugin installed in that vault)
 4. You tell it to build.
 
@@ -39,6 +39,8 @@ Now, how do you actually run it?  You need to modify your package.json like so (
 ```
 
 Now, you can use your package manger (npm, yarn, or pnpm) to `dev` (watch & rebuild with sourcemaps) or `build` (one-time run with compressed code).  (You'll also need to have your package manager `install` your dev dependencies before you start.)
+
+Regardless of build type, the output files are copied to `dist/` under your project root, and optionally copied to your test vault.  Note that because of the way esbuild Sass support works, you'll also see a spurious `dist/main.css` file -- @ophidian/build then copies this file to the correct name of `dist/styles.css`.
 
 ## Publishing Plugins with the Github Action
 
