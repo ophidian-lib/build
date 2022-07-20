@@ -32,7 +32,6 @@ runs:
     - uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node-version }}
-        cache: ${{ inputs.package-manager }}
 
     - uses: pnpm/action-setup@v2.2.2
       if: ${{ inputs.package-manager == 'pnpm' }}
