@@ -7,8 +7,11 @@ import copyNewer from "copy-newer";
 import {basename, dirname, join, resolve} from "path";
 import fs from "fs-extra";
 import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
+import { around } from "monkey-around";
 
 export function addWatch(...watchFiles) {
+    watchFiles = fixPaths(watchFiles);
     return {
         name: 'just-watch',
         setup(build) {
@@ -89,7 +92,7 @@ export default class Builder {
 
     withSass(options) {
         return this.withPlugins(
-            sassPlugin(options),
+            fixPlugin(sassPlugin(options)),
             copy.default({verbose: false, assets: {from: ['dist/main.css'], to: ['styles.css']}})
         );
     }
@@ -102,7 +105,7 @@ export default class Builder {
     }
 
     withWatch(...filenames) {
-        return this.withPlugins(addWatch(...filenames));
+        return this.withPlugins(addWatch(this.srcFile, ...filenames));
     }
 
     withInstall(pluginName=this.manifest.id, hotreload=true) {
@@ -129,4 +132,39 @@ function pluginInstaller(pluginDir, hotreload) {
             });
         }
     }
+}
+
+function fixPlugin(plugin) {
+    around(plugin, {setup(old) {
+        return function (build, ...args) {
+            const remove = around(build, {onLoad: fixHook, onResolve: fixHook});
+            try {
+                return old.call(this, build, ...args);
+            } finally {
+                remove();
+            }
+        }
+    }});
+    return plugin
+}
+
+function fixResult(res) {
+    if (res.then) return res.then(fixResult);
+    if (res.watchFiles) res.watchFiles = fixPaths(res.watchFiles);
+    if (res.watchDirs) res.watchFiles = fixPaths(res.watchDirs);
+    return res;
+}
+
+function fixHook(old) {
+    return function(opts, hook) {
+        return old.call(this, opts, (...args) => fixResult(hook(...args)));
+    }
+}
+
+function fixPaths(paths) {
+    return paths.map(p =>
+        p.startsWith("file:") ? fileURLToPath(p) :  // url, use cross-platform conversion
+        /^\/[A-Za-z]:\//.exec(p) && process.platform === "win32" ? p.slice(1) :  // remove / before drive letter
+        p // path is already proper
+    );
 }
