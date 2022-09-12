@@ -85,6 +85,7 @@ The action supports the following configuration variables, which you may need to
 - `token` - should be set as shown, it will be used to generate the release, upload files, and create release notes
 - `release-notes` should be set to what you want included in the release notes.  Set as shown in the example unless you need something special.  The first line of the string will be converted to an H3 heading (by adding `###` and a space in front of it).
 - `package-manager` should be set to `pnpm`, `npm` or `yarn` to match your package lockfile (`pnpm-lock.yaml`, `package-lock.json`, or `yarn.lock`).  This is the command that will be used to run the `install` and `build` scripts for your plugin.
+- `build-script` can be set if you want the build to use a different package.json script than `build` (e.g. `cibuild`, `publish-plugin`, or something like that)
 - `node-version` can be set if you need a specific node.js version to run your builder; Ophidian targets Node 14 by default.
 - `pnpm-version` can be set if you need a specific version of pnpm.  (The default is the latest version that supports Node 14.)
 

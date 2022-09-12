@@ -29,7 +29,7 @@ if [[ "$MANIFEST_VERSION" != "$TAG_NAME" ]]; then
 fi
 
 "$PACKAGER" install
-"$PACKAGER" build
+"$PACKAGER" "${BUILD_SCRIPT}"
 
 mkdir "${PLUGIN_NAME}"
 

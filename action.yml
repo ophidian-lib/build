@@ -20,6 +20,10 @@ inputs:
     description: Desired package manager (npm, pnpm, or yarn)
     default: pnpm
     required: true
+  build-script:
+    description: package.json script to run (defaults to 'build')
+    default: build
+    required: true
   pnpm-version:
     description: Desired version of pnpm
     default: "6.32.19"
@@ -45,5 +49,6 @@ runs:
         GITHUB_TOKEN: ${{ inputs.token }}
         COMMIT_MESSAGE: ${{ inputs.release-notes }}
         PACKAGER: ${{ inputs.package-manager }}
+        BUILD_SCRIPT: ${{ inputs.build-script }}
       run: |
         "$GITHUB_ACTION_PATH"/publish-plugin.sh
