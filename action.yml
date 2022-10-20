@@ -37,7 +37,7 @@ runs:
       with:
         node-version: ${{ inputs.node-version }}
 
-    - uses: pnpm/action-setup@v2.2.2
+    - uses: pnpm/action-setup@v2.2.4
       if: ${{ inputs.package-manager == 'pnpm' }}
       with:
         version: ${{ inputs.pnpm-version }}
