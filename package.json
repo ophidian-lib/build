@@ -1,6 +1,6 @@
 {
   "name": "@ophidian/build",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A build/publish system for Obsidian Plugins",
   "keywords": [
     "obsidian"
@@ -13,6 +13,7 @@
   "license": "ISC",
   "type": "module",
   "module": "index.js",
+  "exports": "./index.js",
   "dependencies": {
     "builtin-modules": "^3.3.0",
     "copy-newer": "^2.1.2",
