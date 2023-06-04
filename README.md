@@ -19,7 +19,7 @@ This is the entire build configuration.  You can do more complex things with it,
 
 1. You create the builder with the path of your plugin's main module (the one exporting the plugin class)
 2. You indicate whether you're using Sass, CSS, or neither.  (For Sass, you'll `import` .css or .scss files in your code; for CSS you'll just put a styles.css in your repository root.)
-3. You indicate whether you want builds to be copied to the correct directory under your `OBSIDIAN_TEST_VAULT` environment variable and hot-reloaded (if you have the hot-reload plugin installed in that vault)
+3. You indicate whether you want builds to be copied to the correct directory under your `OBSIDIAN_TEST_VAULT` environment variable and hot-reloaded (if you have the hot-reload plugin installed in that vault).  (Note: if you don't want to set the environment variable by hand, you can use an `.envrc` file with [direnv](https://direnv.net/) to set it automatically, or you can just symlink the plugin directory in your test vault to `./dist` (or vice versa) and make sure there's a `.hotreload` file in it.)
 4. You tell it to build.
 
 Now, how do you actually run it?  You need to modify your package.json like so (changing the file name if needed):
