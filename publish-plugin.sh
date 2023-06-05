@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -e  # Fail on unhandled errors
+
 PLUGIN_NAME=$(jq -r .id manifest.json)
 PLUGIN_NAME=${PLUGIN_NAME:-${GITHUB_REPOSITORY##*/}}
 
