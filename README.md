@@ -10,7 +10,7 @@ To build your plugin, you'll need a small file like this (named `ophidian.config
 import Builder from "@ophidian/build";
 
 new Builder("src/pane-relief.ts") // <-- the path of your main module
-.withSass()      // Could be withCss(), or omitted
+.withSass()      // Could be omitted
 .withInstall()   // Optional: publish to OBSIDIAN_TEST_VAULT on build
 .build();
 ```

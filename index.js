@@ -1,7 +1,7 @@
 import esbuild from "esbuild";
 import process from "process";
 import builtins from "builtin-modules";
-import copy from "esbuild-plugin-copy";
+import {copy} from "esbuild-plugin-copy";
 import sassPlugin from "esbuild-plugin-sass";
 import copyNewer from "copy-newer";
 import {basename, dirname, join, resolve} from "path";
@@ -67,13 +67,12 @@ export default class Builder {
                 '.gif': 'dataurl',
                 '.svg': 'dataurl',
             },
-            watch: !prod,
             target: "ES2018",
             logLevel: "info",
             treeShaking: true,
             outfile: "dist/main.js",
             plugins: [
-                copy.default({verbose: false, assets: {from: ['manifest*.json'], to: ['.']}}),
+                copyManifest()
             ],
         }
     }
@@ -93,14 +92,15 @@ export default class Builder {
     withSass(options) {
         return this.withPlugins(
             fixPlugin(sassPlugin(options)),
-            copy.default({verbose: false, assets: {from: ['dist/main.css'], to: ['styles.css']}})
+            copy({verbose: false, assets: {from: ['dist/main.css'], to: ['styles.css']}})
         );
     }
 
     withCss() {
+        console.warn("withCss() is deprecated; import your stylesheet(s) instead.");
         return this.withPlugins(
             // Copy repository/styles.css to dist/
-            copy.default({verbose: false, assets: {from: ['styles.css'], to: ['.']}})
+            copy({verbose: false, assets: {from: ['styles.css'], to: ['.']}})
         );
     }
 
@@ -116,8 +116,31 @@ export default class Builder {
         return this;
     }
 
-    build() {
-        return esbuild.build(this.cfg).catch(() => process.exit(1))
+    async build() {
+        try {
+            if (prod) {
+                await esbuild.build(this.cfg);
+                process.exit(0);
+            } else {
+                const ctx = await esbuild.context(this.cfg);
+                await ctx.watch();
+            }
+        } catch (e) {
+            console.error(e);
+            process.exit(1);
+        }
+    }
+}
+
+function copyManifest() {
+    return {
+        name: "manifest-copier",
+        setup(build) {
+            build.onEnd(async () => {
+                const outDir = build.initialOptions.outdir ?? dirname(build.initialOptions.outfile)
+                await copyNewer("manifest*.json", outDir, {verbose: true, cwd: '.'});
+            });
+        }
     }
 }
 
