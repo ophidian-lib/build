@@ -42,9 +42,10 @@ for f in main.js manifest.json styles.css; do
     fi
     if [[ -f $f ]]; then
         cp $f "${PLUGIN_NAME}/"
-        assets+=(-a "$f")
+        assets+=("$f")
     fi
 done
 
 zip -r "$PLUGIN_NAME".zip "$PLUGIN_NAME"
-hub release create "${assets[@]}" -a "$PLUGIN_NAME".zip -m "$TAG_NAME" -m "### $COMMIT_MESSAGE" "$TAG_NAME"
+gh release create "$TAG_NAME" -t "$TAG_NAME" -n "### $COMMIT_MESSAGE"
+gh release upload --clobber "$TAG_NAME" "${assets[@]}" "$PLUGIN_NAME".zip
