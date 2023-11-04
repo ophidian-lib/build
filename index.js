@@ -2,7 +2,9 @@ import esbuild from "esbuild";
 import process from "process";
 import builtins from "builtin-modules";
 import {copy} from "esbuild-plugin-copy";
+import inlineImportPlugin from "esbuild-plugin-inline-import";
 import sassPlugin from "esbuild-plugin-sass";
+import sass from "sass";
 import copyNewer from "copy-newer";
 import {basename, dirname, join, resolve} from "path";
 import fs from "fs-extra";
@@ -72,6 +74,15 @@ export default class Builder {
             treeShaking: true,
             outfile: "dist/main.js",
             plugins: [
+                inlineImportPlugin({filter: /^text:/}),
+                inlineImportPlugin({filter: /^scss:/, transform(data, args) {
+                    return new Promise((resolve, reject) => {
+                        sass.render({data, includePaths: [dirname(args.path)]}, (err, result) => {
+                            if (err) return reject(err);
+                            resolve(result.css.toString());
+                        });
+                    });
+                }}),
                 copyManifest()
             ],
         }

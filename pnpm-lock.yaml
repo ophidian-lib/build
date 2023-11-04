@@ -5,18 +5,22 @@ specifiers:
   copy-newer: ^2.1.2
   esbuild: 0.17.6
   esbuild-plugin-copy: ^2
+  esbuild-plugin-inline-import: ^1.0.2
   esbuild-plugin-sass: ^1.0.1
   fs-extra: ^10.1.0
   monkey-around: ^2.3.0
+  sass: 1.47.0
 
 dependencies:
   builtin-modules: 3.3.0
   copy-newer: 2.1.2
   esbuild: 0.17.6
   esbuild-plugin-copy: 2.1.1_esbuild@0.17.6
+  esbuild-plugin-inline-import: 1.0.2
   esbuild-plugin-sass: 1.0.1_esbuild@0.17.6
   fs-extra: 10.1.0
   monkey-around: 2.3.0
+  sass: 1.47.0
 
 packages:
 
@@ -384,6 +388,10 @@ packages:
       esbuild: 0.17.6
       fs-extra: 10.1.0
       globby: 11.1.0
+    dev: false
+
+  /esbuild-plugin-inline-import/1.0.2:
+    resolution: {integrity: sha512-BCljgye2Dt63aENlIO3q7UkMhJW1Q2AcMySHGWUw/VAaL9YutKEhUD4t418hSIXWjqx1La+CJLHlJbL1SdH1Uw==}
     dev: false
 
   /esbuild-plugin-sass/1.0.1_esbuild@0.17.6:

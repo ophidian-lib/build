@@ -90,3 +90,31 @@ The action supports the following configuration variables, which you may need to
 - `pnpm-version` can be set if you need a specific version of pnpm.  (The default is the latest version that supports Node 14.)
 
 (Note: I am using this action mainly with pnpm; if you experience problems using npm or yarn, feel free to file an issue, ideally referencing the repo and/or branch that's giving you trouble so I can attempt to reproduce the problem.)
+
+## Additional Features
+
+### Inlining Text and CSS
+
+As of version 1.2, you can now inline files as strings, using code like this:
+
+```ts
+// Both of these are strings from the files at build time
+import someFile from "text:./someFile.whatever";
+import someCSS  from "scss:./some.scss";  // and scss is converted to css
+```
+
+If you want to use this feature, you'll probably want to add the following to one of your .d.ts files (e.g. `global.d.ts` in your source folder):
+
+```ts
+declare module "scss:*" {
+    const value: string;
+    export default value;
+}
+
+declare module "text:*" {
+    const value: string;
+    export default value;
+}
+```
+
+This will tell TypeScript and your IDE that what importing from these locations produces strings.
