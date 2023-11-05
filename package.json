@@ -1,6 +1,6 @@
 {
   "name": "@ophidian/build",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A build/publish system for Obsidian Plugins",
   "keywords": [
     "obsidian"
@@ -19,7 +19,6 @@
     "copy-newer": "^2.1.2",
     "esbuild": "0.17.6",
     "esbuild-plugin-copy": "^2",
-    "esbuild-plugin-inline-import": "^1.0.2",
     "esbuild-plugin-sass": "^1.0.1",
     "fs-extra": "^10.1.0",
     "monkey-around": "^2.3.0",
