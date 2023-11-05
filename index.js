@@ -2,12 +2,12 @@ import esbuild from "esbuild";
 import process from "process";
 import builtins from "builtin-modules";
 import {copy} from "esbuild-plugin-copy";
-import inlineImportPlugin from "esbuild-plugin-inline-import";
 import sassPlugin from "esbuild-plugin-sass";
 import sass from "sass";
 import copyNewer from "copy-newer";
 import {basename, dirname, join, resolve} from "path";
 import fs from "fs-extra";
+import { readFile } from "fs/promises";
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { around } from "monkey-around";
@@ -74,8 +74,8 @@ export default class Builder {
             treeShaking: true,
             outfile: "dist/main.js",
             plugins: [
-                inlineImportPlugin({filter: /^text:/}),
-                inlineImportPlugin({filter: /^scss:/, transform(data, args) {
+                inline({filter: /^text:/}),
+                inline({filter: /^scss:/, transform(data, args) {
                     return new Promise((resolve, reject) => {
                         sass.render({data, includePaths: [dirname(args.path)]}, (err, result) => {
                             if (err) return reject(err);
@@ -185,7 +185,7 @@ function fixPlugin(plugin) {
 function fixResult(res) {
     if (res.then) return res.then(fixResult);
     if (res.watchFiles) res.watchFiles = fixPaths(res.watchFiles);
-    if (res.watchDirs) res.watchFiles = fixPaths(res.watchDirs);
+    if (res.watchDirs) res.watchDirs = fixPaths(res.watchDirs);
     return res;
 }
 
@@ -201,4 +201,27 @@ function fixPaths(paths) {
         /^\/[A-Za-z]:\//.exec(p) && process.platform === "win32" ? p.slice(1) :  // remove / before drive letter
         p // path is already proper
     );
+}
+
+function inline(options) {
+    const { filter, namespace, transform } = Object.assign(
+        { filter: /^inline:/, namespace: '_' + Math.random().toString(36).substr(2, 9) },
+        options
+    );
+    return {
+        name: 'inline',
+        setup(build) {
+            build.onResolve({filter}, args => {
+                const realPath = args.path.replace(filter, '');
+                return { path: resolve(args.resolveDir, realPath), namespace };
+            });
+            build.onLoad({filter: /.*/, namespace}, async args => {
+                let contents = await readFile(args.path, 'utf8');
+                if (typeof transform === 'function') {
+                    contents = await transform(contents, args);
+                }
+                return { contents, loader: 'text', watchFiles: [args.path] }
+            });
+        }
+    }
 }
