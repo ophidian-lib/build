@@ -14,7 +14,7 @@ inputs:
     required: true
   node-version:
     description: Desired version of Node.js
-    default: "14.x"
+    default: "16.x"
     required: true
   package-manager:
     description: Desired package manager (npm, pnpm, or yarn)
@@ -26,7 +26,7 @@ inputs:
     required: true
   pnpm-version:
     description: Desired version of pnpm
-    default: "6.32.19"
+    default: "7.33.6"
     required: true
 
 runs:
