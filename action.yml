@@ -33,11 +33,11 @@ runs:
   using: composite
 
   steps:
-    - uses: actions/setup-node@v3
+    - uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
 
-    - uses: pnpm/action-setup@v2.2.4
+    - uses: pnpm/action-setup@v3
       if: ${{ inputs.package-manager == 'pnpm' }}
       with:
         version: ${{ inputs.pnpm-version }}
