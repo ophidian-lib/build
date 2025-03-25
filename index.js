@@ -69,7 +69,7 @@ export default class Builder {
                 '.gif': 'dataurl',
                 '.svg': 'dataurl',
             },
-            target: "ES2018",
+            target: "ES2021",
             logLevel: "info",
             treeShaking: true,
             outfile: "dist/main.js",
