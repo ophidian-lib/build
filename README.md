@@ -60,6 +60,10 @@ on:
   push:  # Sequence of patterns matched against refs/tags
     tags:
       - "*" # Push events to matching any tag format, i.e. 1.0, 20.15.10
+
+permissions:  # needed unless you configure your repo to allow write actions by default
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
