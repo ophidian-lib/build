@@ -14,11 +14,7 @@ inputs:
     required: true
   node-version:
     description: Desired version of Node.js
-    default: "16.x"
-    required: true
-  package-manager:
-    description: Desired package manager (npm, pnpm, or yarn)
-    default: pnpm
+    default: "22.x"
     required: true
   build-script:
     description: package.json script to run (defaults to 'build')
@@ -33,22 +29,36 @@ runs:
   using: composite
 
   steps:
-    - uses: actions/setup-node@v4
+    - shell: bash
+      run: npm i -g --force corepack && corepack enable
+
+    - uses: actions/setup-node@v6
       with:
         node-version: ${{ inputs.node-version }}
 
-    - uses: pnpm/action-setup@v3
-      if: ${{ inputs.package-manager == 'pnpm' }}
-      with:
-        version: ${{ inputs.pnpm-version }}
-
-    - name: Create release and Upload
-      id: release
+    - name: Build artifacts
+      id: build
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ inputs.token }}
         COMMIT_MESSAGE: ${{ inputs.release-notes }}
         PACKAGER: ${{ inputs.package-manager }}
         BUILD_SCRIPT: ${{ inputs.build-script }}
       run: |
         "$GITHUB_ACTION_PATH"/publish-plugin.sh
+
+    - name: Attest build artifacts
+      uses: actions/attest@v4
+      with:
+        subject-path: |
+          main.js
+          ${{ steps.build.outputs.styles }}
+
+    - name: Create release
+      shell: bash
+      env:
+          GITHUB_TOKEN: ${{ inputs.token }}
+          COMMIT_MESSAGE: ${{ inputs.release-notes }}
+      run: |
+          export TAG_NAME="${GITHUB_REF#refs/tags/}"
+          gh release create "$TAG_NAME" -t "$TAG_NAME" -n "### $COMMIT_MESSAGE" -d \
+            main.js manifest.json ${{ steps.build.outputs.styles }}

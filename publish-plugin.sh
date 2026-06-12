@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 set -e  # Fail on unhandled errors
 
-PLUGIN_NAME=$(jq -r .id manifest.json)
-PLUGIN_NAME=${PLUGIN_NAME:-${GITHUB_REPOSITORY##*/}}
-
 TAG_NAME=${GITHUB_REF##*/}
 MANIFEST_VERSION=$(jq -r .version manifest.json)
 MANIFEST_FILE=manifest.json
@@ -30,22 +27,21 @@ if [[ "$MANIFEST_VERSION" != "$TAG_NAME" ]]; then
     exit 1
 fi
 
+PACKAGER=$(jq -r '.packageManager // "npm"' package.json)
+PACKAGER=${PACKAGER%@*}
+
 "$PACKAGER" install
 "$PACKAGER" "${BUILD_SCRIPT}"
 
-mkdir "${PLUGIN_NAME}"
-
-assets=()
-for f in main.js manifest.json styles.css; do
-    if [[ "$f" != manifest.json && -f "$BUILD_DIR/$f" && ! -f "$f" ]]; then
+# Move built files to project root
+for f in main.js styles.css; do
+    if [[ -f "$BUILD_DIR/$f" && ! -f "$f" ]]; then
         mv "$BUILD_DIR"/$f $f;
-    fi
-    if [[ -f $f ]]; then
-        cp $f "${PLUGIN_NAME}/"
-        assets+=("$f")
     fi
 done
 
-zip -r "$PLUGIN_NAME".zip "$PLUGIN_NAME"
-gh release create "$TAG_NAME" -t "$TAG_NAME" -n "### $COMMIT_MESSAGE"
-gh release upload --clobber "$TAG_NAME" "${assets[@]}" "$PLUGIN_NAME".zip
+if [[ -f styles.css ]]; then
+    echo "styles=styles.css"
+else
+    echo "styles="
+fi >> "$GITHUB_OUTPUT"

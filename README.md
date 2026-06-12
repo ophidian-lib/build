@@ -48,9 +48,9 @@ The Ophidian Publish action makes updating your plugins on Github easy, even if 
 
 - Automatically checking your manifest (or manifest-beta) version against the tag to make sure they match
 - Automatically converting your most recent commit message to (markdown) notes on the release
+- Automatically adding attestations for Obsidian's new release requirements
 - Using the newer of manifest.json or manifest-beta.json for the actual release, so you can release the beta generally just by pushing a new manifest.json in your repo.
 - The built deliverables (main.js and styles.css) can live in the repo root, or a `dist/` or `build/` subdirectory
-- A .zip file with the entire plugin is included in each release, for people to easily download and install the entire plugin if they need a specific version
 
 And, perhaps the best part, it keeps your plugin action scripts short and sweet, e.g.:
 
@@ -61,15 +61,17 @@ on:
     tags:
       - "*" # Push events to matching any tag format, i.e. 1.0, 20.15.10
 
-permissions:  # needed unless you configure your repo to allow write actions by default
+permissions:  # needed for attestations, upload, etc.
   contents: write
+  id-token: write
+  attestations: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: ophidian-lib/build@v1
+      - uses: actions/checkout@v6
+      - uses: ophidian-lib/build@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-notes: ${{ github.event.commits[0].message }}
@@ -82,16 +84,18 @@ Aside from having a `.github/workflows/publish.yml` file like the above example,
 
 If you have a manifest-beta.json, Ophidian will publish it in place of manifest.json, if it contains a higher version number.  Whichever version is chosen must exactly match the tag you pushed (with `git push --tags`) to deploy the new version, or the action will fail with an error.
 
+#### Upgrading to v2
+
+Version 2 of this action supports attestation, and now requires extended permissions to support that (see sample workflow above).  In addition, it now uses corepack rather than a package manager/version in the workflow inputs.  (It will run the package manager specified in your `package.json`'s `packageManager` field, or `npm` if none is specified.)
+
 ### Configuration
 
 The action supports the following configuration variables, which you may need to change from the simple arrangment shown above:
 
 - `token` - should be set as shown, it will be used to generate the release, upload files, and create release notes
 - `release-notes` should be set to what you want included in the release notes.  Set as shown in the example unless you need something special.  The first line of the string will be converted to an H3 heading (by adding `###` and a space in front of it).
-- `package-manager` should be set to `pnpm`, `npm` or `yarn` to match your package lockfile (`pnpm-lock.yaml`, `package-lock.json`, or `yarn.lock`).  This is the command that will be used to run the `install` and `build` scripts for your plugin.
 - `build-script` can be set if you want the build to use a different package.json script than `build` (e.g. `cibuild`, `publish-plugin`, or something like that)
-- `node-version` can be set if you need a specific node.js version to run your builder; Ophidian targets Node 16 by default.
-- `pnpm-version` can be set if you need a specific version of pnpm.  (The default is 7.33.6.)
+- `node-version` can be set if you need a specific node.js version to run your builder; Ophidian targets Node 22 by default.
 
 (Note: I am using this action mainly with pnpm; if you experience problems using npm or yarn, feel free to file an issue, ideally referencing the repo and/or branch that's giving you trouble so I can attempt to reproduce the problem.)
 
