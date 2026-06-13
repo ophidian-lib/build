@@ -88,6 +88,8 @@ If you have a manifest-beta.json, Ophidian will publish it in place of manifest.
 
 Version 2 of this action supports attestation, and now requires extended permissions to support that (see sample workflow above).  In addition, it now uses corepack rather than a package manager/version in the workflow inputs.  (It will run the package manager specified in your `package.json`'s `packageManager` field, or `npm` if none is specified.)
 
+Note: as of v2, releases are now created in a *draft* state.  You will need to manually "publish" them to make them generally available.  (Go to the release, then click on the edit button and then the publish button.)  This was changed to match the Obsidian sample plugin's workflow, and to support scenarios where you might need to attempt creating a release more than once, while also having immutable releases turned on.
+
 ### Configuration
 
 The action supports the following configuration variables, which you may need to change from the simple arrangment shown above:
